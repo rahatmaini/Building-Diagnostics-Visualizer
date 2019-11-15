@@ -2,17 +2,89 @@
 <html>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Geometry - MultiPolygon</title>
+  <title>Living Classrooms</title>
   <style type="text/css">
     html,body{margin:0px;height:100%;width:100%}
     .container{width:100%;height:100%}
   </style>
+  <style>
+
+    .floating-menu-topleft {
+      font-family: sans-serif;
+      background: rgb(22,29,37);
+      padding: 2%;
+      margin-top: 2.5em;
+      margin-left: 2.5em;
+      width: auto;
+      z-index: 100;
+      position: fixed;
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    }
+
+    .floating-menu-topleft a, h4, h6 {
+      text-decoration: none;
+      text-align: center;
+      display: fixed;
+      margin-top: 0.5em;
+      margin-bottom: 1em;
+      color: white;
+    }
+  </style>
+
+<style>
+    .collapsible {
+      cursor: pointer;
+      width: 100%;
+      border: none;
+      text-align: left;
+      outline: none;
+      font-size: 15px;
+      background-color: inherit;
+      transition: 0.3s ease-in;
+    }
+    
+    .content {
+      display: none;
+      overflow: hidden;
+    }
+    </style>
+  
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/maptalks/dist/maptalks.css">
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/maptalks/dist/maptalks.min.js"></script>
   <body>
 
+    <nav class="floating-menu-topleft">
+      <button type="button" class="collapsible"><h4>Hello, Nada</h4></button>
+      <div class="content">
+      <a href=""><h6>Map View</h6></a>
+      <a href= ""><h6>Classes</h6></a>
+      <a href= ""><h6>Export</h6></a>
+      <a href=""><h6>Sign Out</h6></a>
+      </div>
+    </nav>
+
+
+
     <div id="map" class="container"></div>
 
+    <script>
+        var coll = document.getElementsByClassName("collapsible");
+        var i;
+        
+        for (i = 0; i < coll.length; i++) {
+          coll[i].addEventListener("click", function() {
+            this.classList.toggle("active");
+            var content = this.nextElementSibling;
+            if (content.style.display === "block") {
+              content.style.display = "none";
+            } else {
+              content.style.display = "block";
+            }
+          });
+        }
+        </script>
+        
+        
     <script>
       var map = new maptalks.Map('map', {
         center: [-78.510950,38.031875],
@@ -46,6 +118,14 @@
 
       new maptalks.VectorLayer('vector', multiPolygon).addTo(map);
 
+      var customPosition = new maptalks.control.Zoom({
+        'position'  : { 'bottom' : '20', 'left' : '20' },
+        'slider'    : false,
+        'zoomLevel' : false
+      });
+      map.addControl(customPosition);
+
     </script>
   </body>
 </html>
+
