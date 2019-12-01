@@ -8,7 +8,6 @@
   <style type="text/css">
     html,body{margin:0px;height:100%;width:100%;font-family: 'Source Sans Pro', sans serif;}
     .container{width:100%;height:100%}
-    #info{position:fixed;background-color:rgba(13, 13, 13, 0.5);padding:10px 10px 10px 10px;font:13px bold sans-serif;color:#fff;left:0px;top:0px;width:100%;height:140px;overflow:hidden}
   </style>
   <style>
     
@@ -19,6 +18,54 @@
   <script type="text/javascript" src="maptalks.min.js"></script>
   <script src="pikaday.js"></script>
 
+  <script>
+    // She's ugly, but, she'll do
+    var currentlySelectedLocation = ""
+    function send(){
+      var date = document.getElementById("date").innerHTML;
+      var time = document.getElementById("time").innerHTML;
+      var room = document.getElementById("roomN").innerHTML;
+      var pressure = document.getElementById("pressure").innerHTML;
+      var humidity = document.getElementById("humidity").innerHTML;
+      var light = document.getElementById("light").innerHTML;
+      var classStatus = document.getElementById("classStatus").innerHTML;
+      var profID = document.getElementById("profID").innerHTML;
+      var enrollment = document.getElementById("enrollment").innerHTML;
+      var transcriptionConfidence = document.getElementById("transcriptConfidence").innerHTML;
+      var nSignIns = document.getElementById("nSignIn").innerHTML;
+      var nScan = document.getElementById("nScan").innerHTML;
+      var avgGpa = document.getElementById("gpa").innerHTML;
+      
+      var theData = [
+        {
+          "Date": date,
+          "Time": time,
+          "Room Number": room,
+          "Pressure": pressure.replace("kPa" , ""),
+          "Humidity": humidity.replace("%" , ""),
+          "Light": light.replace("%" , ""),
+          "Class": classStatus,
+          "Professor": profID,
+          "Enrolled Students": enrollment,
+          "Lecture Vocal Clarity": transcriptionConfidence.replace("%" , ""),
+          "Sign-ins": nSignIns.replace(" sign-ins" , ""),
+          "Note Scans": nScan.replace(" scans" , ""),
+          "Average GPA": avgGpa
+        },
+      ];
+      //Exporting JSON to a file: https://stackoverflow.com/questions/33780271/export-a-json-object-to-a-text-file
+	  // and here: https://www.codevoila.com/post/30/export-json-data-to-downloadable-file-using-javascript
+      var jsonFile = date+"_"+time+"_"+room+".json";
+      var str = JSON.stringify(theData);
+      //Save the file contents as a DataURI
+      var dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(str);
+      var linkElement = document.createElement('a');
+      linkElement.setAttribute('href', dataUri);
+      linkElement.setAttribute('download', jsonFile);
+      linkElement.click();
+    
+    }
+  </script>
 
   <body>
 
@@ -31,114 +78,65 @@
     </nav>
 
     <nav class="floating-menu-topRight">
-        <button type="button" class="collapsible" onclick="changeIcon2()"><h3>Ambient Room Conditions&nbsp;&nbsp;<span class="ti-arrow-circle-down" style="vertical-align: -1px" id="theIcon2"></span></h3></button>
-        <div class="content"><h5>
-        <table>
-          <tr>
-          <th>Room Name</th>
-          <td>Rice 130</td>
-          </tr>
-          <tr>
-          <th>Temperature</th>
-          <td>73 F</td>
-          </tr>
-          <tr>
-          <th>Pressure</th>
-          <td>780 kPa</td>
-          </tr>
-          <tr>
-          <th>Humidity</th>
-          <td>54%</td>
-          </tr>
-          <tr>
-          <th>Light</th>
-          <td>100</td>
-          </tr>
-          <tr>
-          <th>Class Present?</th>
-          <td>Yes</td>
-          </tr>
-          <tr>
-          <th>Lecture Vocal Clarity&nbsp;&nbsp;</th>
-          <td>87%</td>
-          </tr>
-          <tr>
-          <th>Sign-ins</th>
-          <td>89</td>
-          </tr>
-          <tr>
-          <th>Note Scans</th>
-          <td>248</td>
-          </tr>
-        </table>
+        <button type="button" class="collapsible" onclick="changeIcon2()"><h3>X-ray&nbsp;&nbsp;<span class="ti-arrow-circle-down" style="vertical-align: -1px" id="theIcon2"></span></h3></button>
+        <div class="content" id="dataTable"><h5>
+        <!-- assign each variable value an id, then reference that id in the export form -->
+        
       </h5>
     </div>
     </nav>
 
     <nav class="floating-menu-bottomRight">
-        <button type="button" class="collapsible" onclick="changeIcon3()"><h3>Time Travel&nbsp;&nbsp;<span class="ti-arrow-circle-down" style="vertical-align: -1px" id="theIcon3"></span></h3></button>
-        <div class="content">
-        <input type="text" id="datepicker" placeholder="MM/DD/YYYY"><br />
-        <select> <!-- Yo lol i gotta come up with a cleaner solution than this-->
-          <option value="0000">12AM</option>
-          <option value="0000">12:30AM</option>
-          <option value="0000">1AM</option>
-          <option value="0000">12AM</option>
-          <option value="0000">2AM</option>
-          <option value="0000">2:30AM</option>
-          <option value="0000">3AM</option>
-          <option value="0000">3:30AM</option>
-          <option value="0000">4AM</option>
-          <option value="0000">4:30AM</option>
-          <option value="0000">5AM</option>
-          <option value="0000">5:30AM</option>
-          <option value="0000">6AM</option>
-          <option value="0000">6:30AM</option>
-          <option value="0000">7AM</option>
+        <h3>Time Machine</h3>
+        
+        <input type="text" id="datepicker" placeholder="MM/DD/YYYY" value="Thu Dec 05 2019" onchange='fetchData(document.getElementById("datepicker").value,document.getElementById("timepicker").options[document.getElementById("timepicker").selectedIndex].text,currentlySelectedLocation)'><br />
+        <select id="timepicker" onchange='fetchData(document.getElementById("datepicker").value,document.getElementById("timepicker").options[document.getElementById("timepicker").selectedIndex].text,currentlySelectedLocation)'> <!-- Yo lol i gotta come up with a cleaner solution than this-->
+          <option value="0000">7:00AM</option>
           <option value="0000">7:30AM</option>
-          <option value="0000">8AM</option>
+          <option value="0000">8:00AM</option>
           <option value="0000">8:30AM</option>
-          <option value="0000">9AM</option>
+          <option value="0000">9:00AM</option>
           <option value="0000">9:30AM</option>
-          <option value="0000">10AM</option>
+          <option value="0000">10:00AM</option>
           <option value="0000">10:30AM</option>
-          <option value="0000">11AM</option>
+          <option value="0000">11:00AM</option>
           <option value="0000">11:30AM</option>
-          <option value="0000">12PM</option>
+          <option value="0000">12:00PM</option>
           <option value="0000">12:30PM</option>
-          <option value="0000">1PM</option>
+          <option value="0000">1:00PM</option>
           <option value="0000">1:30PM</option>
-          <option value="0000">2PM</option>
+          <option value="0000">2:00PM</option>
           <option value="0000">2:30PM</option>
-          <option value="0000">3PM</option>
+          <option value="0000">3:00PM</option>
           <option value="0000">3:30PM</option>
-          <option value="0000">4PM</option>
+          <option value="0000">4:00PM</option>
           <option value="0000">4:30PM</option>
-          <option value="0000">5PM</option>
+          <option value="0000">5:00PM</option>
           <option value="0000">5:30PM</option>
-          <option value="0000">6PM</option>
+          <option value="0000">6:00PM</option>
           <option value="0000">6:30PM</option>
-          <option value="0000">7PM</option>
+          <option value="0000">7:00PM</option>
           <option value="0000">7:30PM</option>
-          <option value="0000">8PM</option>
+          <option value="0000">8:00PM</option>
           <option value="0000">8:30PM</option>
-          <option value="0000">9PM</option>
+          <option value="0000">9:00PM</option>
           <option value="0000">9:30PM</option>
-          <option value="0000">10PM</option>
+          <option value="0000">10:00PM</option>
           <option value="0000">10:30PM</option>
-          <option value="0000">11PM</option>
+          <option value="0000">11:00PM</option>
           <option value="0000">11:30PM</option>
         </select>
-      </div>
+        
     </nav>
 
     <nav class="floating-menu-bottomLeft">
-        <h3><span class="ti-layers-alt" title="3D mode"></span>
+              
+        <button type="button" onclick="window.open('test.php')"><span class="ti-user"></span></button>
         <br /><br />
-        <span class="ti-user" title="Student Heatmap"></span>
-        <br /><br />
-        <span class="ti-export" title="Student Heatmap"></span>
-      </h3>
+        
+        <button type="button" onclick="send()" download="example.json"><span class="ti-export"></span></button>
+
+      
     </nav>
 
 
@@ -163,18 +161,111 @@
           else{
             document.getElementById("theIcon2").className = "ti-arrow-circle-up";
           }
-        
         }
-        function changeIcon3() {
-          if (document.getElementById("theIcon3").className == "ti-arrow-circle-up")
+        function openXrayPanel() {
+          document.getElementById("dataTable").style.display="block"
+          document.getElementById("theIcon2").className = "ti-arrow-circle-up"
+           
+        }
+
+        function parseTime(selectedTime) {
+          if (selectedTime.includes(":")) 
           {
-            document.getElementById("theIcon3").className = "ti-arrow-circle-down";
+            selectedTime=selectedTime.replace(":","")
           }
-          else{
-            document.getElementById("theIcon3").className = "ti-arrow-circle-up";
+          if (selectedTime.includes("AM")) 
+          {
+            selectedTime=selectedTime.replace("AM","")
+            if (selectedTime.includes("1200"))
+            selectedTime="0000"
+            if (selectedTime.includes("1230"))
+            selectedTime="0030"
+            selectedTime=parseInt(selectedTime, 10)
           }
-        
+          else if (selectedTime.includes("PM")) 
+          {
+            selectedTime=selectedTime.replace("PM","")
+            if (!selectedTime.includes("12"))
+            selectedTime=parseInt(selectedTime, 10)+1200
+            selectedTime=parseInt(selectedTime, 10)
+          
+          } 
+          return selectedTime
+
         }
+
+        function parseDayOfWeek(selectedDate) {
+          switch (selectedDate.substring(0,3)) {
+            case "Mon":
+              return 1;
+            case "Tue":
+              return 2;
+            case "Wed":
+              return 3;
+            case "Thu":
+              return 4;
+            case "Fri":
+              return 5;
+            default:
+              return 0;
+          }
+        }
+
+        function parseDate(selectedDate) { //Thu Aug 15 2019 -> 20190815
+          switch (selectedDate.substring(4,7)) {
+            case "Jan":
+              return selectedDate.substring(11,15)+"01"+selectedDate.substring(8,10)
+            case "Feb":
+              return selectedDate.substring(11,15)+"02"+selectedDate.substring(8,10)
+            case "Mar":
+              return selectedDate.substring(11,15)+"03"+selectedDate.substring(8,10)
+            case "Apr":
+              return selectedDate.substring(11,15)+"04"+selectedDate.substring(8,10)
+            case "May":
+              return selectedDate.substring(11,15)+"05"+selectedDate.substring(8,10)
+            case "Jun":
+              return selectedDate.substring(11,15)+"06"+selectedDate.substring(8,10)
+            case "Jul":
+              return selectedDate.substring(11,15)+"07"+selectedDate.substring(8,10)
+            case "Aug":
+              return selectedDate.substring(11,15)+"08"+selectedDate.substring(8,10)
+            case "Sep":
+              return selectedDate.substring(11,15)+"09"+selectedDate.substring(8,10)
+            case "Oct":
+              return selectedDate.substring(11,15)+"10"+selectedDate.substring(8,10)
+            case "Nov":
+              return selectedDate.substring(11,15)+"11"+selectedDate.substring(8,10)
+            case "Dec":
+              return selectedDate.substring(11,15)+"12"+selectedDate.substring(8,10)
+           
+          }
+        }
+
+        function fetchData(date, time, roomN) { 
+        if (currentlySelectedLocation != "")
+        openXrayPanel()
+        console.log(parseTime(time))
+        
+        
+        if (window.XMLHttpRequest) {
+            // code for IE7+, Firefox, Chrome, Opera, Safari
+            xmlhttp = new XMLHttpRequest();
+            
+        } else {
+            // code for IE6, IE5
+            xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+        }
+        xmlhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                document.getElementById("dataTable").innerHTML = this.responseText;
+            }
+        };
+        xmlhttp.open("GET","ajax.php?room="+roomN+"&day="+parseDayOfWeek(date)+"&time="+parseTime(time)+"&date="+date+"&humanTime="+time+"&parsedDate="+parseDate(date),true);
+        xmlhttp.send();
+        
+        
+      }
+
         var coll = document.getElementsByClassName("collapsible");
         var i;
         
@@ -197,7 +288,7 @@
     <script>
       var map = new maptalks.Map('map', {
         center: [-78.51047,38.03289],
-        zoom: 19,
+        zoom: 18,
         baseLayer: new maptalks.TileLayer('base', {
           urlTemplate: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
           subdomains: ['a','b','c','d'],
@@ -216,9 +307,11 @@
       $result = mysqli_query($con,$sql);
       
       $positionArray = array();
+      $roomNameArray = array();
 
       while($row = mysqli_fetch_array($result)) {
         array_push($positionArray,$row['latLongList']);
+        array_push($roomNameArray,$row['roomN']);
     }
       ?>
 
@@ -276,33 +369,45 @@
           return inside;
       };
 
-      var polygon = [[-78.51081,38.03216], [-78.51061,38.03211], [-78.51059,38.03217], [-78.51077,38.03223] ];
 
-      var locationsDictionary = { //needs to be pulled from PHP dynamically
-          "Olsson120": [[-78.51081,38.03216], [-78.51061,38.03211], [-78.51059,38.03217], [-78.51077,38.03223]],
-          "Rice Hall 130":  [[-78.51042,38.03171], [-78.51044,38.03167], [-78.5107,38.03175], [-78.51067,38.0318]] ,
-          "Thornton Hall E316":  [[-78.5097,38.03253], [-78.50972,38.03248], [-78.50989,38.03253], [-78.50986,38.03258]] ,
-          "Mechanical Engr Bldg 205":  [[-78.51108,38.03275], [-78.51114,38.03263], [-78.51124,38.03267], [-78.51119,38.03277]] ,
-          "Chemistry Bldg 402":  [[-78.51177,38.03365], [-78.51159,38.03359], [-78.51151,38.03371], [-78.5117,38.03378]] 
+      var locationsDictionary = { 
+
+        <?php 
+        for ($i=0; $i<count($roomNameArray); $i++)
+        {
+          if ($i<count($roomNameArray)-1)
+          {
+            echo '"' . $roomNameArray[$i] . '": ' . substr($positionArray[$i], 1, -1) . ',';
+          }
+          else
+          {
+            echo '"' . $roomNameArray[$i] . '": ' . substr($positionArray[$i], 1, -1);
+          }
+        } 
+         ?>
+
       }
+
+      
       
       map.on('click', function (param) {
         for (x in locationsDictionary) {
           if (inside(param.coordinate.toFixed(5).toArray(), locationsDictionary[x]))
           {
-            console.log(x)
+            currentlySelectedLocation=x
+            fetchData(document.getElementById('datepicker').value,document.getElementById("timepicker").options[document.getElementById("timepicker").selectedIndex].text,currentlySelectedLocation)
+            
+
           }
         }
       });
 
-      
 
       
 
-      <?php
-      mysqli_close($con);
-      ?>
+      
 
+      
     </script>
 
 <script src="pikaday.js"></script>
