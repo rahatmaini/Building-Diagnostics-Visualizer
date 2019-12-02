@@ -45,7 +45,7 @@
         
 
 
-        $roomConditionSQL="SELECT * FROM RoomCondition WHERE roomN ='" . $room . "'" ;
+        $roomConditionSQL="SELECT * FROM RoomCondition WHERE roomN ='" . $room . "' AND date=" . $lampDate . " AND time=" . $computedTime ;
         $roomConditionResult = mysqli_query($con,$roomConditionSQL);
         
 
@@ -69,7 +69,7 @@
 
           $numOfEnrolledStudents = mysqli_fetch_array($enrolledStudentResult)[0];
 
-          $transcriptionConfidenceSQL="SELECT * FROM `Lamp` NATURAL JOIN `Audio` NATURAL JOIN `Records` WHERE time=" . $computedTime ." AND roomN='" . $room . "' AND date=" . $lampDate;
+          $transcriptionConfidenceSQL="SELECT * FROM getTranscriptConfidence WHERE time=" . $computedTime ." AND roomN='" . $room . "' AND date=" . $lampDate;
           $transcriptionConfidenceResult = mysqli_query($con,$transcriptionConfidenceSQL);
           $transcriptionConfidence = mysqli_fetch_array($transcriptionConfidenceResult);
           
@@ -131,7 +131,6 @@
           $grade=$row2['grade'];
 
 
-          #echo $classroomSQL;
           echo "<table>";
           echo "<tr>";
           echo "<th>Date</th>";
